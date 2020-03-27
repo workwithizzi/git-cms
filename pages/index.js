@@ -119,7 +119,7 @@ const Home = () => {
           </div>
 
           <Link href="/get-contents">
-            <h3 className="button__card">Get contents&rarr;</h3>
+            <a className="button__card">Get contents&rarr;</a>
           </Link>
         </div>
       </main>
