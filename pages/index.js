@@ -13,6 +13,13 @@ const Home = () => {
   const [username, setUsername] = useState("");
   const [profile, setProfile] = useState({});
   const [profileAuth, setProfileAuth] = useState({});
+  const [repository, setRepository] = useState({
+    name: "",
+    data: {}
+  });
+  
+  const _onUsernameChange = () => setUsername(event.target.value);
+  const _onRepositoryChange = () => setRepository({ name: event.target.value });
 
   const _getZen = async () => {
     try {
@@ -25,8 +32,6 @@ const Home = () => {
       return;
     }
   }
-
-  const _onUsernameChange = () => setUsername(event.target.value);
 
   const _getUser = async () => {
     try {
@@ -50,6 +55,21 @@ const Home = () => {
       console.log(user)
       setProfileAuth(user);
       setIsResponse(true);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  }
+
+  const _getRepository = async () => {
+    try {
+      const repo = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${username}/${repository.name}`, {
+        auth: {
+          username: process.env.GITHUB_PRIVATE_TOKEN,
+        }
+      });
+      console.log(repo);
+      setRepository({ data: repo });
     } catch (error) {
       console.log(error);
       return;
@@ -88,6 +108,12 @@ const Home = () => {
             <h3 className="inline">GitHub Authenticated User &rarr;</h3>
             <input className="inline input__text" placeholder="GitHub Username" onChange={_onUsernameChange} />
             <button className="button__card" onClick={_getUserAuth}>Get a user GitHub profile.</button>
+          </div>
+          <div className="card">
+            <h3 className="inline">GitHub Repository &rarr;</h3>
+            <input className="inline input__text" placeholder="GitHub Username" onChange={_onUsernameChange} />
+            <input className="inline input__text" placeholder="GitHub Repository" onChange={_onRepositoryChange} />
+            <button className="button__card" onClick={_getRepository}>Get a repository.</button>
           </div>
         </div>
       </main>
