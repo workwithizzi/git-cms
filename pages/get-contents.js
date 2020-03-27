@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import Head from 'next/head'
-import Link from 'next/link'
 
 import axios from "axios";
 
@@ -8,75 +7,9 @@ const API_REQUEST_CONFIG = {
   GITHUB_API_URL: "https://api.github.com"
 }
 
-const Home = () => {
+const GetContents = (props) => {
 
-  const [isResponse, setIsResponse] = useState(false);
-  const [zen, setZen] = useState({});
-  const [username, setUsername] = useState("");
-  const [profile, setProfile] = useState({});
-  const [profileAuth, setProfileAuth] = useState({});
-  const [repository, setRepository] = useState({
-    name: "",
-    data: {}
-  });
-  
-  const _onUsernameChange = () => setUsername(event.target.value);
-  const _onRepositoryChange = () => setRepository({ name: event.target.value });
-
-  const _getZen = async () => {
-    try {
-      const zen = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/zen`);
-      console.log(zen)
-      setZen(zen);
-      setIsResponse(true);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
-
-  const _getUser = async () => {
-    try {
-      const user = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/users/${username}`);
-      console.log(user)
-      setProfile(user);
-      setIsResponse(true);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
-
-  const _getUserAuth = async () => {
-    try {
-      const user = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/users/${username}`, {
-        auth: {
-          username: process.env.GITHUB_PRIVATE_TOKEN,
-        }
-      });
-      console.log(user)
-      setProfileAuth(user);
-      setIsResponse(true);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
-
-  const _getRepository = async () => {
-    try {
-      const repo = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${username}/${repository.name}`, {
-        auth: {
-          username: process.env.GITHUB_PRIVATE_TOKEN,
-        }
-      });
-      console.log(repo);
-      setRepository({ data: repo });
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
+  console.log(props.text);
 
   return (
     <div className="container">
@@ -95,60 +28,11 @@ const Home = () => {
         </p>
 
         <div className="grid">
-          <button className="card" onClick={_getZen}>
-            <h3>GitHub Zen &rarr;</h3>
-            <p>Get a random selection from the GitHub design philosophies.</p>
-          </button>
-
-          <div className="card">
-            <h3 className="inline">GitHub User &rarr;</h3>
-            <input className="inline input__text" placeholder="GitHub Username" onChange={_onUsernameChange} />
-            <button className="button__card" onClick={_getUser}>Get a user GitHub profile.</button>
-          </div>
-
-          <div className="card">
-            <h3 className="inline">GitHub Authenticated User &rarr;</h3>
-            <input className="inline input__text" placeholder="GitHub Username" onChange={_onUsernameChange} />
-            <button className="button__card" onClick={_getUserAuth}>Get a user GitHub profile.</button>
-          </div>
-          <div className="card">
-            <h3 className="inline">GitHub Repository &rarr;</h3>
-            <input className="inline input__text" placeholder="GitHub Username" onChange={_onUsernameChange} />
-            <input className="inline input__text" placeholder="GitHub Repository" onChange={_onRepositoryChange} />
-            <button className="button__card" onClick={_getRepository}>Get a repository.</button>
-          </div>
-
-          <Link href="/get-contents">
-            <h3 className="button__card">Get contents&rarr;</h3>
-          </Link>
+				{props.text && (
+        	<pre>{props.text}</pre>
+				)}
         </div>
       </main>
-
-      {isResponse &&
-        <div className="grid">
-          {zen.status === 200 && <p className="card__response">{zen.data}</p>}
-          {profile.status === 200 && (
-            <div>
-              <h1>{profile.data.login}</h1>
-              <img src={profile.data.avatar_url} alt="Profile picture" width="200px" />
-              <p>{profile.data.name}</p>
-              <p>{profile.data.location}</p>
-              <p>Remaining requests: {profile.headers["x-ratelimit-remaining"]}</p>
-            </div>
-          )}
-          {profileAuth.status === 200 && (
-            <div>
-              <h1>{profileAuth.data.login}</h1>
-              <img src={profileAuth.data.avatar_url} alt="Profile picture" width="200px" />
-              <p>{profileAuth.data.name}</p>
-              <p>{profileAuth.data.location}</p>
-              <p>Remaining requests: {profileAuth.headers["x-ratelimit-remaining"]}</p>
-              <p>Plan: {profileAuth.data.plan.name} (only available for requests with Auth)</p>
-            </div>
-          )}
-        </div>
-      }
-
       <footer>
         <a
           href="https://zeit.co?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
@@ -341,4 +225,24 @@ const Home = () => {
   )
 }
 
-export default Home
+GetContents.getInitialProps = async () => {
+  let text = "";
+  try {
+    const contents = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/workwithizzi/git-cms/contents/package.json`, {
+      auth: {
+        username: process.env.GITHUB_PRIVATE_TOKEN,
+      }
+    });
+    const res = contents.data.content.toString();
+    console.log("res:\n" + res);
+    let buff = Buffer.from(res, 'base64');
+    text = buff.toString('utf-8');
+    console.log(text);
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+  return { text }
+}
+
+export default GetContents
