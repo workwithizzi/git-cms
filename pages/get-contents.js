@@ -1,248 +1,305 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Head from 'next/head'
 
 import axios from "axios";
 
 const API_REQUEST_CONFIG = {
-  GITHUB_API_URL: "https://api.github.com"
+	GITHUB_API_URL: "https://api.github.com",
+	GITHUB_USERNAME: "workwithizzi",
+	GITHUB_REPO: "gatsby-boilerplate",
+	GITHUB_FILE_PATH: "limber.yml"
 }
+
+const GET_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.GITHUB_USERNAME}/${API_REQUEST_CONFIG.GITHUB_REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
+const PUT_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.GITHUB_USERNAME}/${API_REQUEST_CONFIG.GITHUB_REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
 
 const GetContents = (props) => {
 
-  console.log(props.text);
+	const [contents, setContents] = useState("");
 
-  return (
-    <div className="container">
-      <Head>
-        <title>Git CMS</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+	useEffect(() => {
+		setContents(props.text);
+	}, []);
 
-      <main>
-        <h1 className="title">
-          Welcome to Git CMS
-        </h1>
+	const _updateContents = () => {
+		setContents(event.target.value);
+	}
 
-        <p className="description">
-          Read file from the git repo
-        </p>
+	const _uploadContent = async () => {
+		const contentsBase64 = window.btoa(contents);
+		try {
+			const uploadContent = await axios.put(PUT_CONTENTS_REQUEST,
+			{
+					message: "Edit file via GitHub API", // Required. The commit message.
+					content: contentsBase64, // Required. The new file content, using Base64 encoding.
+					sha: props.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
+					branch: "master", // The branch name. Default: the repository’s default branch (usually master)
+					// The person that committed the file. Default: the authenticated user.
+					// committer: {
+					// 	name: "",
+					// 	email: ""
+					// },
+					// The author of the file. Default: The committer or the authenticated user if you omit committer.
+					// author: {
+					// 	name: "",
+					// 	email: ""
+					// }
+			},
+			{
+				auth: {
+					username: process.env.GITHUB_PRIVATE_TOKEN,
+				}
+			});
+			console.log(uploadContent);
+		} catch (error) {
+			console.log(error);
+			return;
+		}
+	}
 
-        <div className="grid">
-				{props.text && (
-        	<pre>{props.text}</pre>
-				)}
-        </div>
-      </main>
-      <footer>
-        <a
-          href="https://zeit.co?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/zeit.svg" alt="ZEIT Logo" />
-        </a>
-      </footer>
+	return (
+		<div className="container">
+			<Head>
+				<title>Git CMS</title>
+				<link rel="icon" href="/favicon.ico" />
+			</Head>
 
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+			<main>
+				<h1 className="title">
+					Welcome to Git CMS
+				</h1>
 
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+				<p className="description">
+					Read file from the git repo
+				</p>
 
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+				<div>
+					{props.text && (
+						<>
+							<textarea style={{ width: "30rem", height: "30rem" }} onChange={_updateContents} value={contents} />
+							<button style={{ display: "block" }} className="button__card" onClick={_uploadContent}>Upload Content</button>
+						</>
+					)}
+				</div>
+			</main>
+			<footer>
+				<a
+					href="https://zeit.co?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Powered by <img src="/zeit.svg" alt="ZEIT Logo" />
+				</a>
+			</footer>
 
-        footer img {
-          margin-left: 0.5rem;
-        }
+			<style jsx>{`
+				.container {
+					min-height: 100vh;
+					padding: 0 0.5rem;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+				}
 
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+				main {
+					padding: 5rem 0;
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+				}
 
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
+				footer {
+					width: 100%;
+					height: 100px;
+					border-top: 1px solid #eaeaea;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
 
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
+				footer img {
+					margin-left: 0.5rem;
+				}
 
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
+				footer a {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
 
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
+				a {
+					color: inherit;
+					text-decoration: none;
+				}
 
-        .title,
-        .description {
-          text-align: center;
-        }
+				.title a {
+					color: #0070f3;
+					text-decoration: none;
+				}
 
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
+				.title a:hover,
+				.title a:focus,
+				.title a:active {
+					text-decoration: underline;
+				}
 
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
+				.title {
+					margin: 0;
+					line-height: 1.15;
+					font-size: 4rem;
+				}
 
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
+				.title,
+				.description {
+					text-align: center;
+				}
 
-          max-width: 800px;
-          margin-top: 3rem;
-        }
+				.description {
+					line-height: 1.5;
+					font-size: 1.5rem;
+				}
 
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
+				code {
+					background: #fafafa;
+					border-radius: 5px;
+					padding: 0.75rem;
+					font-size: 1.1rem;
+					font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+						DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+				}
 
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
+				.grid {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					flex-wrap: wrap;
 
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
+					max-width: 800px;
+					margin-top: 3rem;
+				}
 
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
+				.card {
+					margin: 1rem;
+					flex-basis: 45%;
+					padding: 1.5rem;
+					text-align: left;
+					color: inherit;
+					text-decoration: none;
+					border: 1px solid #eaeaea;
+					border-radius: 10px;
+					transition: color 0.15s ease, border-color 0.15s ease;
+				}
 
-        .card__response {
-          margin: 1rem;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
+				.card:hover,
+				.card:focus,
+				.card:active {
+					color: #0070f3;
+					border-color: #0070f3;
+				}
 
-        .inline {
-          display: inline-block;
-        }
+				.card h3 {
+					margin: 0 0 1rem 0;
+					font-size: 1.5rem;
+				}
 
-        .input__text {
-          margin: 0 0.2rem 0.4rem;
-          padding: 0.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-          vertical-align: middle;
-        }
+				.card p {
+					margin: 0;
+					font-size: 1.25rem;
+					line-height: 1.5;
+				}
 
-        .button__card {
-          margin: 0.2rem;
-          padding: 0.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
+				.card__response {
+					margin: 1rem;
+					padding: 1.5rem;
+					text-align: left;
+					color: inherit;
+					text-decoration: none;
+					border: 1px solid #eaeaea;
+					border-radius: 10px;
+					transition: color 0.15s ease, border-color 0.15s ease;
+				}
 
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
-        }
-      `}</style>
+				.inline {
+					display: inline-block;
+				}
 
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-            Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-        }
+				.input__text {
+					margin: 0 0.2rem 0.4rem;
+					padding: 0.5rem;
+					text-align: left;
+					color: inherit;
+					text-decoration: none;
+					border: 1px solid #eaeaea;
+					border-radius: 10px;
+					transition: color 0.15s ease, border-color 0.15s ease;
+					vertical-align: middle;
+				}
 
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
-  )
+				.button__card {
+					margin: 0.2rem;
+					padding: 0.5rem;
+					text-align: left;
+					color: inherit;
+					text-decoration: none;
+					border: 1px solid #eaeaea;
+					border-radius: 10px;
+					transition: color 0.15s ease, border-color 0.15s ease;
+				}
+
+				@media (max-width: 600px) {
+					.grid {
+						width: 100%;
+						flex-direction: column;
+					}
+				}
+			`}</style>
+
+			<style jsx global>{`
+				html,
+				body {
+					padding: 0;
+					margin: 0;
+					font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+						Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+				}
+
+				* {
+					box-sizing: border-box;
+				}
+			`}</style>
+		</div>
+	)
 }
 
 GetContents.getInitialProps = async () => {
-  let text = "";
-  try {
-    const contents = await axios.get(`${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/workwithizzi/git-cms/contents/package.json`, {
-      auth: {
-        username: process.env.GITHUB_PRIVATE_TOKEN,
-      }
-    });
-    const res = contents.data.content.toString();
-    console.log("res:\n" + res);
-    let buff = Buffer.from(res, 'base64');
-    text = buff.toString('utf-8');
-    console.log(text);
-  } catch (error) {
-    console.log(error);
-    return;
-  }
-  return { text }
+	let text = "";
+	let sha = "";
+
+	try {
+		const contents = await axios.get(GET_CONTENTS_REQUEST, {
+			auth: {
+				username: process.env.GITHUB_PRIVATE_TOKEN,
+			}
+		});
+		const res = contents.data.content.toString();
+		sha = contents.data.sha;
+		console.log("res:\n" + res);
+		let buff = Buffer.from(res, 'base64');
+		text = buff.toString('utf-8');
+		console.log(text);
+	} catch (error) {
+		console.log(error);
+		return;
+	}
+	const content = {
+		text,
+		sha
+	};
+
+	return content;
 }
 
-export default GetContents
+export default GetContents;
