@@ -1,61 +1,86 @@
 import React, { useState, useEffect } from "react";
 import Head from 'next/head'
-
 import axios from "axios";
 
 const API_REQUEST_CONFIG = {
 	GITHUB_API_URL: "https://api.github.com",
-	GITHUB_USERNAME: "workwithizzi",
-	GITHUB_REPO: "gatsby-boilerplate",
-	GITHUB_FILE_PATH: "limber.yml"
-}
+	OWNER: "workwithizzi",
+	REPO: "git-cms-test",
+};
 
-const GET_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.GITHUB_USERNAME}/${API_REQUEST_CONFIG.GITHUB_REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
-const PUT_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.GITHUB_USERNAME}/${API_REQUEST_CONFIG.GITHUB_REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
+// GET ALL FILES
+const GET_ALL_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/`;
+// ---
+
+
+
+const GITHUB_FILE_PATH = "limber.yml";
+
+
+const GET_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
+const PUT_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
+const DELETE_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/test.yml`;
 
 const GetContents = (props) => {
 
-	const [contents, setContents] = useState("");
+	console.log(props);
+
+	const [files, setFiles] = useState([]);
+	// const [contents, setContents] = useState("");
 
 	useEffect(() => {
-		setContents(props.text);
-	}, []);
+		setFiles(props.allFiles);
+	}, [props.allFiles]);
 
-	const _updateContents = () => {
-		setContents(event.target.value);
-	}
+	const _listAllFiles = files =>
+		files.map(file => {
+			return (
+				<ul>
+					<li key={file.sha}>
+						<p>{file.name}</p>
+						<button>Get Content</button>
+						<button>Update Content</button>
+						<button>Delete File</button>
+					</li>
+				</ul>
+			);
+		});
 
-	const _uploadContent = async () => {
-		const contentsBase64 = window.btoa(contents);
-		try {
-			const uploadContent = await axios.put(PUT_CONTENTS_REQUEST,
-			{
-					message: "Edit file via GitHub API", // Required. The commit message.
-					content: contentsBase64, // Required. The new file content, using Base64 encoding.
-					sha: props.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
-					branch: "master", // The branch name. Default: the repository’s default branch (usually master)
-					// The person that committed the file. Default: the authenticated user.
-					// committer: {
-					// 	name: "",
-					// 	email: ""
-					// },
-					// The author of the file. Default: The committer or the authenticated user if you omit committer.
-					// author: {
-					// 	name: "",
-					// 	email: ""
-					// }
-			},
-			{
-				auth: {
-					username: process.env.GITHUB_PRIVATE_TOKEN,
-				}
-			});
-			console.log(uploadContent);
-		} catch (error) {
-			console.log(error);
-			return;
-		}
-	}
+	// const _updateContents = () => {
+	// 	setContents(event.target.value);
+	// }
+
+	// const _uploadContent = async () => {
+	// 	const contentsBase64 = window.btoa(contents);
+	// 	try {
+	// 		const uploadContent = await axios.put(PUT_CONTENTS_REQUEST,
+	// 		{
+	// 				message: "Edit file via GitHub API", // Required. The commit message.
+	// 				content: contentsBase64, // Required. The new file content, using Base64 encoding.
+	// 				sha: props.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
+	// 				branch: "master", // The branch name. Default: the repository’s default branch (usually master)
+	// 				// The person that committed the file. Default: the authenticated user.
+	// 				// committer: {
+	// 				// 	name: "",
+	// 				// 	email: ""
+	// 				// },
+	// 				// The author of the file. Default: The committer or the authenticated user if you omit committer.
+	// 				// author: {
+	// 				// 	name: "",
+	// 				// 	email: ""
+	// 				// }
+	// 		},
+	// 		{
+	// 			auth: {
+	// 				username: process.env.GITHUB_PRIVATE_TOKEN,
+	// 			}
+	// 		});
+	// 		console.log(uploadContent);
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		return;
+	// 	}
+	// }
 
 	return (
 		<div className="container">
@@ -74,12 +99,14 @@ const GetContents = (props) => {
 				</p>
 
 				<div>
-					{props.text && (
+					<h2>All Files:</h2>
+					{files && _listAllFiles(files)}
+					{/* {props.text && (
 						<>
 							<textarea style={{ width: "30rem", height: "30rem" }} onChange={_updateContents} value={contents} />
 							<button style={{ display: "block" }} className="button__card" onClick={_uploadContent}>Upload Content</button>
 						</>
-					)}
+					)} */}
 				</div>
 			</main>
 			<footer>
@@ -274,32 +301,32 @@ const GetContents = (props) => {
 	)
 }
 
-GetContents.getInitialProps = async () => {
-	let text = "";
-	let sha = "";
-
+// GET all files axios request
+const getAllFiles = async () => {
 	try {
-		const contents = await axios.get(GET_CONTENTS_REQUEST, {
+		const files = await axios.get(GET_ALL_CONTENTS_REQUEST, {
 			auth: {
 				username: process.env.GITHUB_PRIVATE_TOKEN,
 			}
 		});
-		const res = contents.data.content.toString();
-		sha = contents.data.sha;
-		console.log("res:\n" + res);
-		let buff = Buffer.from(res, 'base64');
-		text = buff.toString('utf-8');
-		console.log(text);
+		console.log(`FILES: ${JSON.stringify(files.data)}`);
+		return files.data;
 	} catch (error) {
 		console.log(error);
-		return;
+		return error;
 	}
-	const content = {
-		text,
-		sha
-	};
+}
 
-	return content;
+// SSR: GET all the files
+GetContents.getInitialProps = async () => {
+	let response = {};
+	try {
+		const allFiles = await getAllFiles();
+		response.allFiles = allFiles;
+	} catch(error) {
+		response.error = error;
+	}
+	return response;
 }
 
 export default GetContents;
