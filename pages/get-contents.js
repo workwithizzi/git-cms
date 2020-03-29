@@ -12,34 +12,55 @@ const API_REQUEST_CONFIG = {
 const GET_ALL_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/`;
 // ---
 
-
-
-const GITHUB_FILE_PATH = "limber.yml";
-
-
-const GET_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
+// GET FILE CONTENT
+const GET_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/`;
 const PUT_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
 const DELETE_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/test.yml`;
 
 const GetContents = (props) => {
-
-	console.log(props);
 
 	const [files, setFiles] = useState([]);
 	// const [contents, setContents] = useState("");
 
 	useEffect(() => {
 		setFiles(props.allFiles);
-	}, [props.allFiles]);
+	}, [files]);
+
+	const _getFileContent = async path => {
+		const url = `${GET_CONTENTS_REQUEST}${path}`;
+		try {
+			const file = await axios.get(url, {
+				auth: {
+					username: process.env.GITHUB_PRIVATE_TOKEN,
+				}
+			});
+			const res = file.data.content;
+			console.log(`FILE CONTENT BASE64: ${res}`);
+			const fromBase64ToString = window.atob(res);
+			files.map((file, index) => {
+				if (file.name === path) {
+					files[index].content = fromBase64ToString;
+				}
+			})
+			setFiles([... files]);
+		} catch (error) {
+			console.log(error);
+		}
+	}
 
 	const _listAllFiles = files =>
 		files.map(file => {
 			return (
 				<div key={file.sha}>
 						<p>{file.name}</p>
-						<button>Get Content</button>
+						<button onClick={() => _getFileContent(file.path)}>Get Content</button>
 						<button>Update Content</button>
 						<button>Delete File</button>
+						{
+							file.content && (
+								<pre>{file.content}</pre>
+							)
+						}
 				</div>
 			);
 		});
