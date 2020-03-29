@@ -35,14 +35,12 @@ const GetContents = (props) => {
 	const _listAllFiles = files =>
 		files.map(file => {
 			return (
-				<ul>
-					<li key={file.sha}>
+				<div key={file.sha}>
 						<p>{file.name}</p>
 						<button>Get Content</button>
 						<button>Update Content</button>
 						<button>Delete File</button>
-					</li>
-				</ul>
+				</div>
 			);
 		});
 
