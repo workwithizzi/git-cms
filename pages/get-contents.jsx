@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Head from 'next/head'
+import Head from "next/head";
 import axios from "axios";
 
 const API_REQUEST_CONFIG = {
@@ -30,13 +30,13 @@ const GetContents = (props) => {
 		setFiles(props.allFiles);
 	}, [props.allFiles]);
 
-	const _getFileContent = async (path, readOrWrite) => {
+	const _getFileContent = async(path, readOrWrite) => {
 		const url = `${GET_CONTENTS_REQUEST}${path}`;
 		try {
 			const file = await axios.get(url, {
 				auth: {
 					username: process.env.GITHUB_PRIVATE_TOKEN,
-				}
+				},
 			});
 			const res = file.data.content;
 			setCurrentFile(file.data);
@@ -47,7 +47,7 @@ const GetContents = (props) => {
 					files[index].content = fromBase64ToString;
 					setContents(files[index].content);
 				}
-			})
+			});
 			setFiles([... files]);
 			if (readOrWrite === "read") {
 				setIsRead(true);
@@ -59,18 +59,18 @@ const GetContents = (props) => {
 		} catch (error) {
 			console.log(error);
 		}
-	}
+	};
 
 	const _updateContents = event => {
 		setContents(event.target.value);
-	}
+	};
 
 	const _uploadContent = async file => {
 		const contentsBase64 = window.btoa(contents);
-		const url = `${PUT_CONTENTS_REQUEST}${file.path}`
+		const url = `${PUT_CONTENTS_REQUEST}${file.path}`;
 		try {
 			const uploadContent = await axios.put(url,
-			{
+				{
 					message: "Edit file via GitHub API", // Required. The commit message.
 					content: contentsBase64, // Required. The new file content, using Base64 encoding.
 					sha: file.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
@@ -85,28 +85,28 @@ const GetContents = (props) => {
 					// 	name: "",
 					// 	email: ""
 					// }
-			},
-			{
-				auth: {
-					username: process.env.GITHUB_PRIVATE_TOKEN,
-				}
-			});
+				},
+				{
+					auth: {
+						username: process.env.GITHUB_PRIVATE_TOKEN,
+					},
+				});
 			if (uploadContent.status === 200) {
-				alert("Successfully Uploaded!")
+				alert("Successfully Uploaded!");
 			}
 			console.log(uploadContent);
 		} catch (error) {
 			console.log(error);
 			return;
 		}
-	}
+	};
 
 	const _deleteFile = async file => {
-		const url = `${DELETE_CONTENTS_REQUEST}${file.path}`
+		const url = `${DELETE_CONTENTS_REQUEST}${file.path}`;
 		try {
 			const deleteFile = await axios.delete(url,
-			{
-				params:
+				{
+					params:
 					{
 						message: "Delete file via GitHub API", // Required. The commit message.
 						sha: file.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
@@ -121,71 +121,71 @@ const GetContents = (props) => {
 						// 	name: "",
 						// 	email: ""
 						// }
-				},
-				auth: {
-					username: process.env.GITHUB_PRIVATE_TOKEN,
-				}
-			});
+					},
+					auth: {
+						username: process.env.GITHUB_PRIVATE_TOKEN,
+					},
+				});
 			if (deleteFile.status === 200) {
-				alert("Successfully Deleted!")
+				alert("Successfully Deleted!");
 			}
 			console.log(deleteFile);
 		} catch (error) {
 			console.log(error);
 			return;
 		}
-	}
+	};
 
 	const _listAllFiles = files =>
 		files.map(file => {
 			return (
 				<div key={Math.random(100000)}>
-						<p>{file.name}</p>
-						<button onClick={() => _getFileContent(file.path, "read")}>Get Content</button>
-						<button onClick={() => _getFileContent(file.path, "write")}>Update Content</button>
-						<button onClick={() => _deleteFile(file)}>Delete File</button>
+					<p>{file.name}</p>
+					<button onClick={() => _getFileContent(file.path, "read")}>Get Content</button>
+					<button onClick={() => _getFileContent(file.path, "write")}>Update Content</button>
+					<button onClick={() => _deleteFile(file)}>Delete File</button>
 				</div>
 			);
 		});
 
-		const _onFileNameChange = () => {
-			setNewFileName(event.target.value);
-		}
+	const _onFileNameChange = () => {
+		setNewFileName(event.target.value);
+	};
 
-		const _createFile = async () => {
-			event.preventDefault();
-			const url = `${PUT_CONTENTS_REQUEST}${newFileName}`
-			try {
-				const createFile = await axios.put(url,
+	const _createFile = async() => {
+		event.preventDefault();
+		const url = `${PUT_CONTENTS_REQUEST}${newFileName}`;
+		try {
+			const createFile = await axios.put(url,
 				{
-						message: "Create file via GitHub API", // Required. The commit message.
-						content: "", // Required. The new file content, using Base64 encoding.
-						branch: "master", // The branch name. Default: the repository’s default branch (usually master)
-						// The person that committed the file. Default: the authenticated user.
-						// committer: {
-						// 	name: "",
-						// 	email: ""
-						// },
-						// The author of the file. Default: The committer or the authenticated user if you omit committer.
-						// author: {
-						// 	name: "",
-						// 	email: ""
-						// }
+					message: "Create file via GitHub API", // Required. The commit message.
+					content: "", // Required. The new file content, using Base64 encoding.
+					branch: "master", // The branch name. Default: the repository’s default branch (usually master)
+					// The person that committed the file. Default: the authenticated user.
+					// committer: {
+					// 	name: "",
+					// 	email: ""
+					// },
+					// The author of the file. Default: The committer or the authenticated user if you omit committer.
+					// author: {
+					// 	name: "",
+					// 	email: ""
+					// }
 				},
 				{
 					auth: {
 						username: process.env.GITHUB_PRIVATE_TOKEN,
-					}
+					},
 				});
-				if (createFile.status === 201) {
-					alert("Successfully Created!")
-				}
-				console.log(createFile);
-			} catch (error) {
-				console.log(error);
-				return;
+			if (createFile.status === 201) {
+				alert("Successfully Created!");
 			}
+			console.log(createFile);
+		} catch (error) {
+			console.log(error);
+			return;
 		}
+	};
 
 	return (
 		<div className="container">
@@ -208,25 +208,25 @@ const GetContents = (props) => {
 					{files && _listAllFiles(files)}
 					<hr />
 					<div>
-							{
-								(isRead) && (
-									<pre>{contents}</pre>
-								)
-							}
-							{
-								(isWrite) && (
-									<>
-										<textarea style={{ width: "30rem", height: "30rem" }} onChange={event => _updateContents(event)} value={contents} />
-										<button style={{ display: "block" }} className="button__card" onClick={() => _uploadContent(currentFile)}>Upload Content</button>
-									</>
-								)
-							}
-						</div>
+						{
+							(isRead) && (
+								<pre>{contents}</pre>
+							)
+						}
+						{
+							(isWrite) && (
+								<>
+									<textarea style={{ width: "30rem", height: "30rem" }} onChange={event => _updateContents(event)} value={contents} />
+									<button style={{ display: "block" }} className="button__card" onClick={() => _uploadContent(currentFile)}>Upload Content</button>
+								</>
+							)
+						}
+					</div>
 					<hr />
 					<h3>Create a file</h3>
 					<form onSubmit={_createFile}>
-					<input type="text" onChange={_onFileNameChange} />
-					<button type="submit">Create File</button>
+						<input type="text" onChange={_onFileNameChange} />
+						<button type="submit">Create File</button>
 					</form>
 				</div>
 			</main>
@@ -419,16 +419,16 @@ const GetContents = (props) => {
 				}
 			`}</style>
 		</div>
-	)
-}
+	);
+};
 
 // GET all files axios request
-const getAllFiles = async () => {
+const getAllFiles = async() => {
 	try {
 		const files = await axios.get(GET_ALL_CONTENTS_REQUEST, {
 			auth: {
 				username: process.env.GITHUB_PRIVATE_TOKEN,
-			}
+			},
 		});
 		console.log(`FILES: ${JSON.stringify(files.data)}`);
 		return files.data;
@@ -436,11 +436,11 @@ const getAllFiles = async () => {
 		console.log(error);
 		return error;
 	}
-}
+};
 
 // SSR: GET all the files
-GetContents.getInitialProps = async () => {
-	let response = {};
+GetContents.getInitialProps = async() => {
+	const response = {};
 	try {
 		const allFiles = await getAllFiles();
 		response.allFiles = allFiles;
@@ -448,6 +448,6 @@ GetContents.getInitialProps = async () => {
 		response.error = error;
 	}
 	return response;
-}
+};
 
 export default GetContents;
