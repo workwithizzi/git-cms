@@ -14,19 +14,21 @@ const GET_ALL_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${A
 
 // GET FILE CONTENT
 const GET_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/`;
-const PUT_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/${API_REQUEST_CONFIG.GITHUB_FILE_PATH}`;
-const DELETE_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/test.yml`;
+const PUT_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/`;
+const DELETE_CONTENTS_REQUEST = `${API_REQUEST_CONFIG.GITHUB_API_URL}/repos/${API_REQUEST_CONFIG.OWNER}/${API_REQUEST_CONFIG.REPO}/contents/`;
 
 const GetContents = (props) => {
 
 	const [files, setFiles] = useState([]);
-	// const [contents, setContents] = useState("");
+	const [isRead, setIsRead] = useState(false);
+	const [contents, setContents] = useState("");
+	const [newFileName, setNewFileName] = useState("");
 
 	useEffect(() => {
 		setFiles(props.allFiles);
 	}, [files]);
 
-	const _getFileContent = async path => {
+	const _getFileContent = async (path, isRead) => {
 		const url = `${GET_CONTENTS_REQUEST}${path}`;
 		try {
 			const file = await axios.get(url, {
@@ -40,11 +42,88 @@ const GetContents = (props) => {
 			files.map((file, index) => {
 				if (file.name === path) {
 					files[index].content = fromBase64ToString;
+					setContents(files[index].content);
 				}
 			})
 			setFiles([... files]);
+			setIsRead(isRead);
 		} catch (error) {
 			console.log(error);
+		}
+	}
+
+	const _updateContents = event => {
+		setContents(event.target.value);
+	}
+
+	const _uploadContent = async file => {
+		const contentsBase64 = window.btoa(contents);
+		const url = `${PUT_CONTENTS_REQUEST}${file.path}`
+		try {
+			const uploadContent = await axios.put(url,
+			{
+					message: "Edit file via GitHub API", // Required. The commit message.
+					content: contentsBase64, // Required. The new file content, using Base64 encoding.
+					sha: file.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
+					branch: "master", // The branch name. Default: the repository’s default branch (usually master)
+					// The person that committed the file. Default: the authenticated user.
+					// committer: {
+					// 	name: "",
+					// 	email: ""
+					// },
+					// The author of the file. Default: The committer or the authenticated user if you omit committer.
+					// author: {
+					// 	name: "",
+					// 	email: ""
+					// }
+			},
+			{
+				auth: {
+					username: process.env.GITHUB_PRIVATE_TOKEN,
+				}
+			});
+			if (uploadContent.status === 200) {
+				alert("Successfully Uploaded!")
+			}
+			console.log(uploadContent);
+		} catch (error) {
+			console.log(error);
+			return;
+		}
+	}
+
+	const _deleteFile = async file => {
+		const url = `${DELETE_CONTENTS_REQUEST}${file.path}`
+		try {
+			const deleteFile = await axios.delete(url,
+			{
+				params:
+					{
+						message: "Delete file via GitHub API", // Required. The commit message.
+						sha: file.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
+						branch: "master", // The branch name. Default: the repository’s default branch (usually master)
+						// The person that committed the file. Default: the authenticated user.
+						// committer: {
+						// 	name: "",
+						// 	email: ""
+						// },
+						// The author of the file. Default: The committer or the authenticated user if you omit committer.
+						// author: {
+						// 	name: "",
+						// 	email: ""
+						// }
+				},
+				auth: {
+					username: process.env.GITHUB_PRIVATE_TOKEN,
+				}
+			});
+			if (deleteFile.status === 200) {
+				alert("Successfully Deleted!")
+			}
+			console.log(deleteFile);
+		} catch (error) {
+			console.log(error);
+			return;
 		}
 	}
 
@@ -53,53 +132,66 @@ const GetContents = (props) => {
 			return (
 				<div key={file.sha}>
 						<p>{file.name}</p>
-						<button onClick={() => _getFileContent(file.path)}>Get Content</button>
-						<button>Update Content</button>
-						<button>Delete File</button>
-						{
-							file.content && (
-								<pre>{file.content}</pre>
-							)
-						}
+						<button onClick={() => _getFileContent(file.path, true)}>Get Content</button>
+						<button onClick={() => _getFileContent(file.path, false)}>Update Content</button>
+						<button onClick={() => _deleteFile(file)}>Delete File</button>
+						<div>
+							{
+								(isRead && file.content) && (
+									<pre>{file.content}</pre>
+								)
+							}
+							{
+								(!isRead && file.content) && (
+									<>
+										<textarea style={{ width: "30rem", height: "30rem" }} onChange={event => _updateContents(event)} value={contents} />
+										<button style={{ display: "block" }} className="button__card" onClick={() => _uploadContent(file)}>Upload Content</button>
+									</>
+								)
+							}
+						</div>
 				</div>
 			);
 		});
 
-	// const _updateContents = () => {
-	// 	setContents(event.target.value);
-	// }
+		const _onFileNameChange = () => {
+			setNewFileName(event.target.value);
+		}
 
-	// const _uploadContent = async () => {
-	// 	const contentsBase64 = window.btoa(contents);
-	// 	try {
-	// 		const uploadContent = await axios.put(PUT_CONTENTS_REQUEST,
-	// 		{
-	// 				message: "Edit file via GitHub API", // Required. The commit message.
-	// 				content: contentsBase64, // Required. The new file content, using Base64 encoding.
-	// 				sha: props.sha, // Required if you are updating a file. The blob SHA of the file being replaced.
-	// 				branch: "master", // The branch name. Default: the repository’s default branch (usually master)
-	// 				// The person that committed the file. Default: the authenticated user.
-	// 				// committer: {
-	// 				// 	name: "",
-	// 				// 	email: ""
-	// 				// },
-	// 				// The author of the file. Default: The committer or the authenticated user if you omit committer.
-	// 				// author: {
-	// 				// 	name: "",
-	// 				// 	email: ""
-	// 				// }
-	// 		},
-	// 		{
-	// 			auth: {
-	// 				username: process.env.GITHUB_PRIVATE_TOKEN,
-	// 			}
-	// 		});
-	// 		console.log(uploadContent);
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		return;
-	// 	}
-	// }
+		const _createFile = async () => {
+			event.preventDefault();
+			const url = `${PUT_CONTENTS_REQUEST}${newFileName}`
+			try {
+				const createFile = await axios.put(url,
+				{
+						message: "Create file via GitHub API", // Required. The commit message.
+						content: "", // Required. The new file content, using Base64 encoding.
+						branch: "master", // The branch name. Default: the repository’s default branch (usually master)
+						// The person that committed the file. Default: the authenticated user.
+						// committer: {
+						// 	name: "",
+						// 	email: ""
+						// },
+						// The author of the file. Default: The committer or the authenticated user if you omit committer.
+						// author: {
+						// 	name: "",
+						// 	email: ""
+						// }
+				},
+				{
+					auth: {
+						username: process.env.GITHUB_PRIVATE_TOKEN,
+					}
+				});
+				if (createFile.status === 201) {
+					alert("Successfully Created!")
+				}
+				console.log(createFile);
+			} catch (error) {
+				console.log(error);
+				return;
+			}
+		}
 
 	return (
 		<div className="container">
@@ -120,12 +212,12 @@ const GetContents = (props) => {
 				<div>
 					<h2>All Files:</h2>
 					{files && _listAllFiles(files)}
-					{/* {props.text && (
-						<>
-							<textarea style={{ width: "30rem", height: "30rem" }} onChange={_updateContents} value={contents} />
-							<button style={{ display: "block" }} className="button__card" onClick={_uploadContent}>Upload Content</button>
-						</>
-					)} */}
+					<hr />
+					<h3>Create a file</h3>
+					<form onSubmit={_createFile}>
+					<input type="text" onChange={_onFileNameChange} />
+					<button type="submit">Create File</button>
+					</form>
 				</div>
 			</main>
 			<footer>
