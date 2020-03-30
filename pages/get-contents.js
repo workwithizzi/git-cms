@@ -21,14 +21,16 @@ const GetContents = (props) => {
 
 	const [files, setFiles] = useState([]);
 	const [isRead, setIsRead] = useState(false);
+	const [isWrite, setIsWrite] = useState(false);
 	const [contents, setContents] = useState("");
 	const [newFileName, setNewFileName] = useState("");
+	const [currentFile, setCurrentFile] = useState("");
 
 	useEffect(() => {
 		setFiles(props.allFiles);
-	}, [files]);
+	}, [props.allFiles]);
 
-	const _getFileContent = async (path, isRead) => {
+	const _getFileContent = async (path, readOrWrite) => {
 		const url = `${GET_CONTENTS_REQUEST}${path}`;
 		try {
 			const file = await axios.get(url, {
@@ -37,6 +39,7 @@ const GetContents = (props) => {
 				}
 			});
 			const res = file.data.content;
+			setCurrentFile(file.data);
 			console.log(`FILE CONTENT BASE64: ${res}`);
 			const fromBase64ToString = window.atob(res);
 			files.map((file, index) => {
@@ -46,7 +49,13 @@ const GetContents = (props) => {
 				}
 			})
 			setFiles([... files]);
-			setIsRead(isRead);
+			if (readOrWrite === "read") {
+				setIsRead(true);
+				setIsWrite(false);
+			} else if (readOrWrite === "write") {
+				setIsRead(false);
+				setIsWrite(true);
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -132,24 +141,9 @@ const GetContents = (props) => {
 			return (
 				<div key={Math.random(100000)}>
 						<p>{file.name}</p>
-						<button onClick={() => _getFileContent(file.path, true)}>Get Content</button>
-						<button onClick={() => _getFileContent(file.path, false)}>Update Content</button>
+						<button onClick={() => _getFileContent(file.path, "read")}>Get Content</button>
+						<button onClick={() => _getFileContent(file.path, "write")}>Update Content</button>
 						<button onClick={() => _deleteFile(file)}>Delete File</button>
-						<div>
-							{
-								isRead && (
-									<pre>{file.content}</pre>
-								)
-							}
-							{
-								!isRead && (
-									<>
-										<textarea style={{ width: "30rem", height: "30rem" }} onChange={event => _updateContents(event)} value={contents} />
-										<button style={{ display: "block" }} className="button__card" onClick={() => _uploadContent(file)}>Upload Content</button>
-									</>
-								)
-							}
-						</div>
 				</div>
 			);
 		});
@@ -212,6 +206,22 @@ const GetContents = (props) => {
 				<div>
 					<h2>All Files:</h2>
 					{files && _listAllFiles(files)}
+					<hr />
+					<div>
+							{
+								(isRead) && (
+									<pre>{contents}</pre>
+								)
+							}
+							{
+								(isWrite) && (
+									<>
+										<textarea style={{ width: "30rem", height: "30rem" }} onChange={event => _updateContents(event)} value={contents} />
+										<button style={{ display: "block" }} className="button__card" onClick={() => _uploadContent(currentFile)}>Upload Content</button>
+									</>
+								)
+							}
+						</div>
 					<hr />
 					<h3>Create a file</h3>
 					<form onSubmit={_createFile}>
