@@ -130,19 +130,19 @@ const GetContents = (props) => {
 	const _listAllFiles = files =>
 		files.map(file => {
 			return (
-				<div key={file.sha}>
+				<div key={Math.random(100000)}>
 						<p>{file.name}</p>
 						<button onClick={() => _getFileContent(file.path, true)}>Get Content</button>
 						<button onClick={() => _getFileContent(file.path, false)}>Update Content</button>
 						<button onClick={() => _deleteFile(file)}>Delete File</button>
 						<div>
 							{
-								(isRead && file.content) && (
+								isRead && (
 									<pre>{file.content}</pre>
 								)
 							}
 							{
-								(!isRead && file.content) && (
+								!isRead && (
 									<>
 										<textarea style={{ width: "30rem", height: "30rem" }} onChange={event => _updateContents(event)} value={contents} />
 										<button style={{ display: "block" }} className="button__card" onClick={() => _uploadContent(file)}>Upload Content</button>
