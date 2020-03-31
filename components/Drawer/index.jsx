@@ -1,15 +1,28 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
+import PT from "prop-types";
 
-function Drawer() {
+function Drawer({ activePath }) {
 	return (
-		<div className="l-drawer">
-			<button className="l-drawer__btn">
-				<FontAwesomeIcon className="o-drawer__btn--icon" icon={faCog} size="2x" />
-				<span className="o-drawer__btn--text">Settings</span>
-			</button>
-		</div>
+		<ul className="l-drawer">
+			<li className="l-drawer__item">
+				<a className={`l-drawer__btn btn--dashboard ${activePath === "/admin" ? "isActive" : "notActive"}`} href="/admin">
+					<FontAwesomeIcon className="btn--icon dashboard--icon" icon={faCog} />
+					<span className="btn--text dashboard--text">Dashboard</span>
+				</a>
+			</li>
+			<li className="l-drawer__item">
+				<a className="l-drawer__btn" href="/settings">
+					<FontAwesomeIcon className="btn--icon" icon={faCog} />
+					<span className="btn--text">Settings</span>
+				</a>
+			</li>
+		</ul>
 	);
 }
+
+Drawer.propTypes = {
+	activePath: PT.string.isRequired,
+};
 
 export default Drawer;

@@ -1,7 +1,22 @@
 :root {
 	--main-color: #293845;
 	--settings-color: purple;
-	--settings-reverse-color: whitesmoke;
+	--reverse-color: whitesmoke;
+}
+
+@mixin flexbox($flex-direction, $justify-content, $align-items) {
+	display: flex;
+	flex-direction: $flex-direction;
+	justify-content: $justify-content;
+	align-items: $align-items;
+}
+
+@mixin btn-active($bg-color, $reverse-color) {
+	background-color: $bg-color;
+		.btn--icon,
+		.btn--text {
+			color: $reverse-color;
+		}
 }
 
 $font-size: 50px;
@@ -12,42 +27,53 @@ $font-size: 50px;
 	text-align: center;
 }
 
+// Drawer
 .l-drawer {
 	width: 10rem;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	align-items: center;
+	height: 7rem;
+	@include flexbox(column, space-between, center);
 	margin: 1rem;
 	padding: 1rem;
 	border: 2px solid var(--main-color);
 }
 
+.l-drawer__item {
+	list-style: none;
+}
+
 .l-drawer__btn {
 	width: 9rem;
 	height: 3rem;
-	padding: 0.5rem 0;
-	border: 2px solid var(--settings-color);
+	@include flexbox(row, flex-start, center);
+	padding-left: 8px;
 	border-radius: 8px;
+	text-decoration: none;
+}
+
+.btn--dashboard {
+	border: 2px solid var(--main-color);
 
 	&:hover {
-		background-color: var(--settings-color);
-		.o-drawer__btn--icon,
-		.o-drawer__btn--text {
-			color: var(--settings-reverse-color);
-		}
+		@include btn-active(var(--main-color), var(--reverse-color));
 	}
 }
 
-.o-drawer__btn--icon {
-	margin-right: 8px;
-	color: var(--settings-color);
+.btn--dashboard.isActive {
+	@include btn-active(var(--main-color), var(--reverse-color));
 }
 
-.o-drawer__btn--text {
+.btn--icon {
+	height: 1.2rem;
+	margin-right: 8px;
+}
+
+.btn--text {
 	margin-right: 4px;
-	color: var(--settings-color);
 	font-size: large;
-	vertical-align: top;
 	font-weight: 600;
+}
+
+.dashboard--icon,
+.dashboard--text {
+	color: var(--main-color);
 }
