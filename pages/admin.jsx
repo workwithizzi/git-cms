@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/admin.scss";
 
-import Drawer from "../components/drawer";
+import Drawer from "../components/Drawer";
 
 function AdminPage() {
 	return (
