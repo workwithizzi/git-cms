@@ -1,11 +1,53 @@
 :root {
-	--title-color: #293845;
+	--main-color: #293845;
+	--settings-color: purple;
+	--settings-reverse-color: whitesmoke;
 }
 
 $font-size: 50px;
 
-.title {
+.o-title {
 	font-size: $font-size;
-	color: var(--title-color);
+	color: var(--main-color);
 	text-align: center;
+}
+
+.l-drawer {
+	width: 10rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	margin: 1rem;
+	padding: 1rem;
+	border: 2px solid var(--main-color);
+}
+
+.l-drawer__btn {
+	width: 9rem;
+	height: 3rem;
+	padding: 0.5rem 0;
+	border: 2px solid var(--settings-color);
+	border-radius: 8px;
+
+	&:hover {
+		background-color: var(--settings-color);
+		.o-drawer__btn--icon,
+		.o-drawer__btn--text {
+			color: var(--settings-reverse-color);
+		}
+	}
+}
+
+.o-drawer__btn--icon {
+	margin-right: 8px;
+	color: var(--settings-color);
+}
+
+.o-drawer__btn--text {
+	margin-right: 4px;
+	color: var(--settings-color);
+	font-size: large;
+	vertical-align: top;
+	font-weight: 600;
 }
