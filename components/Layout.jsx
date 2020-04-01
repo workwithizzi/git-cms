@@ -4,7 +4,7 @@ import PT from "prop-types";
 function Layout({ children }) {
 	return (
 		<>
-			<main>
+			<main className="l-container">
 				{children}
 			</main>
 		</>

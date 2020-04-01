@@ -21,7 +21,13 @@
 
 $font-size: 50px;
 
+// Layout
+.l-container {
+	@include flexbox(row, flex-start, flex-start);
+}
+
 .o-title {
+	margin: 0 auto;
 	font-size: $font-size;
 	color: var(--main-color);
 	text-align: center;
@@ -58,8 +64,20 @@ $font-size: 50px;
 	}
 }
 
+.btn--settings {
+	border: 2px solid var(--settings-color);
+
+	&:hover {
+		@include btn-active(var(--settings-color), var(--reverse-color));
+	}
+}
+
 .btn--dashboard.isActive {
 	@include btn-active(var(--main-color), var(--reverse-color));
+}
+
+.btn--settings.isActive {
+	@include btn-active(var(--settings-color), var(--reverse-color));
 }
 
 .btn--icon {
@@ -76,4 +94,14 @@ $font-size: 50px;
 .dashboard--icon,
 .dashboard--text {
 	color: var(--main-color);
+}
+
+.settings--icon,
+.settings--text {
+	color: var(--settings-color);
+}
+
+// Settings
+.l-settings {
+	margin: 0 auto;
 }
