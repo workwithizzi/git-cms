@@ -10,14 +10,20 @@ class MyApp extends App {
 			pageProps = await Component.getInitialProps(ctx);
 		}
 
-		return { pageProps, path: ctx.pathname };
+		return { pageProps, path: ctx.asPath };
 	}
 
 	render() {
 		const { Component, pageProps, path } = this.props;
 
-		const unSlashedPath = path.split("/")[1];
-		const currentPage = unSlashedPath.charAt(0).toUpperCase() + unSlashedPath.slice(1);
+		let currentPage = "";
+		if (path === "/admin") {
+			currentPage = "Admin";
+		} else {
+			const unSlashedPath = path.split("=")[1];
+			console.log(unSlashedPath);
+			currentPage = unSlashedPath.charAt(0).toUpperCase() + unSlashedPath.slice(1);
+		}
 
 		return (
 			<>
