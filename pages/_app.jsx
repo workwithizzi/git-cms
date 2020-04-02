@@ -21,7 +21,6 @@ class MyApp extends App {
 			currentPage = "Admin";
 		} else {
 			const unSlashedPath = path.split("=")[1];
-			console.log(unSlashedPath);
 			currentPage = unSlashedPath.charAt(0).toUpperCase() + unSlashedPath.slice(1);
 		}
 
