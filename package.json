@@ -1,6 +1,6 @@
 {
   "name": "git-cms",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,13 +8,18 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/react-fontawesome": "^0.1.9",
     "@octokit/rest": "^17.1.4",
+    "@zeit/next-sass": "^1.0.1",
     "axios": "^0.19.2",
     "next": "9.3.2",
     "react": "16.13.1",
     "react-dom": "16.13.1"
   },
   "devDependencies": {
+    "@workwithizzi/eslint-config-react": "^0.0.2",
     "dotenv": "^8.2.0"
   }
 }

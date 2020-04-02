@@ -1,0 +1,4 @@
+{
+	"extends": "@workwithizzi/eslint-config-react",
+	"rules": {}
+}
