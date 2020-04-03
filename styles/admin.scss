@@ -1,0 +1,107 @@
+:root {
+	--main-color: #293845;
+	--settings-color: purple;
+	--reverse-color: whitesmoke;
+}
+
+@mixin flexbox($flex-direction, $justify-content, $align-items) {
+	display: flex;
+	flex-direction: $flex-direction;
+	justify-content: $justify-content;
+	align-items: $align-items;
+}
+
+@mixin btn-active($bg-color, $reverse-color) {
+	background-color: $bg-color;
+		.btn--icon,
+		.btn--text {
+			color: $reverse-color;
+		}
+}
+
+$font-size: 50px;
+
+// Layout
+.l-container {
+	@include flexbox(row, flex-start, flex-start);
+}
+
+.o-title {
+	margin: 0 auto;
+	font-size: $font-size;
+	color: var(--main-color);
+	text-align: center;
+}
+
+// Drawer
+.l-drawer {
+	width: 10rem;
+	height: 7rem;
+	@include flexbox(column, space-between, center);
+	margin: 1rem;
+	padding: 1rem;
+	border: 2px solid var(--main-color);
+}
+
+.l-drawer__item {
+	list-style: none;
+}
+
+.l-drawer__btn {
+	width: 9rem;
+	height: 3rem;
+	@include flexbox(row, flex-start, center);
+	padding-left: 8px;
+	border-radius: 8px;
+	text-decoration: none;
+}
+
+.btn--dashboard {
+	border: 2px solid var(--main-color);
+
+	&:hover {
+		@include btn-active(var(--main-color), var(--reverse-color));
+	}
+}
+
+.btn--settings {
+	border: 2px solid var(--settings-color);
+
+	&:hover {
+		@include btn-active(var(--settings-color), var(--reverse-color));
+	}
+}
+
+.btn--dashboard.isActive {
+	@include btn-active(var(--main-color), var(--reverse-color));
+}
+
+.btn--settings.isActive {
+	@include btn-active(var(--settings-color), var(--reverse-color));
+}
+
+.btn--icon {
+	height: 1.2rem;
+	margin-right: 8px;
+}
+
+.btn--text {
+	margin-right: 4px;
+	font-size: large;
+	font-weight: 600;
+}
+
+.dashboard--icon,
+.dashboard--text {
+	color: var(--main-color);
+}
+
+.settings--icon,
+.settings--text {
+	color: var(--settings-color);
+}
+
+// Settings
+.l-settings {
+	margin: 0 auto;
+}
