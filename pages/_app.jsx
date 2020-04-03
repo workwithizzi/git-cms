@@ -19,6 +19,10 @@ class MyApp extends App {
 		let currentPage = "";
 		if (path === "/admin") {
 			currentPage = "Admin";
+		} else if (path === "/") {
+			currentPage = "Home";
+		} else if (path === "/get-contents") {
+			currentPage = "Contents";
 		} else {
 			const unSlashedPath = path.split("=")[1];
 			currentPage = unSlashedPath.charAt(0).toUpperCase() + unSlashedPath.slice(1);
