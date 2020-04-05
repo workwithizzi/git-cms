@@ -26,7 +26,6 @@ const client = axios.create({
  */
 const request = function(options) {
 	const onSuccess = function(response) {
-		console.debug("Request Successful!", response);
 		return response.data;
 	};
 
