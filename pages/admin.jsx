@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { withRouter } from "next/router";
-import jsyaml from "js-yaml";
 import PT from "prop-types";
 
 import "../styles/admin.scss";
@@ -12,7 +11,8 @@ import RenderLimberSettings from "../components/RenderLimberSettings";
 import RequestService from "../util/requestService";
 import parseYaml from "../util/parseYaml";
 
-function AdminPage({ router, limberSettings }) {
+function AdminPage(props) {
+	const { router, limberSettings } = props;
 
 	// PARSE "limber/settings.yml" content as JS Object and PUT to the State BEFORE on page render
 	useEffect(() => {
@@ -23,6 +23,7 @@ function AdminPage({ router, limberSettings }) {
 	// DEFINE State
 	const [settings, setSettings] = useState({});
 	const [pagesSettings, setPagesSettings] = useState({});
+	const [pages, setPages] = useState([]);
 
 	// PARSE "limber/settings.yml" content as JS Object and PUT to the State
 	function _parseSettings(settings) {
@@ -33,17 +34,18 @@ function AdminPage({ router, limberSettings }) {
 	async function _parsePages() {
 		// it is not wraped in a try-catch block as RequestService has it's own error handling
 		const response = await RequestService
-			.getLimberPagesSettings({
-				auth: {
-					username: process.env.GITHUB_PRIVATE_TOKEN,
-				},
-			});
+			.getLimberPagesSettings();
 		const data = parseYaml(response);
 		setPagesSettings(data);
 	}
 
 	function _fetchPages(path) {
-		console.log(path);
+		RequestService
+			.getLimberPages(path)
+			.then(pages => {
+				console.log(pages);
+			});
+		
 	}
 
 	function _renderContentGroups(groups) {
@@ -97,18 +99,6 @@ function AdminPage({ router, limberSettings }) {
 		</>
 	);
 }
-
-// GET "limber/settings.yml" file
-AdminPage.getInitialProps = async() => {
-	// it is not wraped in a try-catch block as RequestService has it's own error handling
-	const response = await RequestService
-		.getLimberSettings({
-			auth: {
-				username: process.env.GITHUB_PRIVATE_TOKEN,
-			},
-		});
-	return { limberSettings: response};
-};
 
 AdminPage.propTypes = {
 	router: PT.object.isRequired,
