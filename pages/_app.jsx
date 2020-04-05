@@ -2,6 +2,8 @@ import App from "next/app";
 import Head from "next/head";
 import React from "react";
 
+import RequestService from "../util/requestService";
+
 class MyApp extends App {
 	static async getInitialProps({ Component, ctx }) {
 		let pageProps = {};
@@ -10,11 +12,23 @@ class MyApp extends App {
 			pageProps = await Component.getInitialProps(ctx);
 		}
 
-		return { pageProps, path: ctx.asPath };
+		const limberSettings = await RequestService
+			.getLimberSettings();
+
+		return {
+			pageProps,
+			path: ctx.asPath,
+			limberSettings,
+		};
 	}
 
 	render() {
-		const { Component, pageProps, path } = this.props;
+		const {
+			Component,
+			pageProps,
+			path,
+			limberSettings,
+		} = this.props;
 
 		let currentPage = "";
 		if (path === "/admin") {
@@ -34,7 +48,11 @@ class MyApp extends App {
 					<title>{`Git CMS | ${currentPage}`}</title>
 					<link rel="icon" href="/favicon.ico" />
 				</Head>
-				<Component {...pageProps} />
+				<Component
+					path={path}
+					limberSettings={limberSettings}
+					{...pageProps}
+				/>
 			</>
 		);
 	}
