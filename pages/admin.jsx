@@ -9,34 +9,23 @@ import Drawer from "../components/Drawer";
 import RenderLimberSettings from "../components/RenderLimberSettings";
 
 import RequestService from "../util/requestService";
-import parseYaml from "../util/parseYaml";
 
 function AdminPage(props) {
 	const { router, limberSettings } = props;
 
 	// PARSE "limber/settings.yml" content as JS Object and PUT to the State BEFORE on page render
 	useEffect(() => {
-		_parseSettings(limberSettings);
 		_parsePages();
 	}, []);
 
 	// DEFINE State
-	const [settings, setSettings] = useState({});
 	const [pagesSettings, setPagesSettings] = useState({});
-	const [pages, setPages] = useState([]);
-
-	// PARSE "limber/settings.yml" content as JS Object and PUT to the State
-	function _parseSettings(settings) {
-		const data = parseYaml(settings);
-		setSettings(data);
-	}
 
 	async function _parsePages() {
 		// it is not wraped in a try-catch block as RequestService has it's own error handling
 		const response = await RequestService
 			.getLimberPagesSettings();
-		const data = parseYaml(response);
-		setPagesSettings(data);
+		setPagesSettings(response);
 	}
 
 	function _fetchPages(path) {
@@ -71,7 +60,7 @@ function AdminPage(props) {
 	return (
 		<>
 			<Layout>
-				<Drawer activePath={router.asPath} limberData={settings} />
+				<Drawer activePath={router.asPath} limberData={limberSettings} />
 
 				{/* Dashboard tab */}
 				{
@@ -86,14 +75,14 @@ function AdminPage(props) {
 				{
 					router.asPath === "/admin?page=settings" && (
 						<>
-							<RenderLimberSettings settings={settings} />
+							<RenderLimberSettings settings={limberSettings} />
 						</>
 					)
 				}
 
 				{/* Content-Groups tabs */}
 				{
-					settings.groups && _renderContentGroups(settings.groups)
+					limberSettings.groups && _renderContentGroups(limberSettings.groups)
 				}
 			</Layout>
 		</>
