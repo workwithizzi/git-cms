@@ -21,6 +21,7 @@ const request = function(options) {
 	const onSuccess = function(response) {
 		// data from a response
 		const data = response.data;
+		// PARSE "yml" content as Object
 		return parseYamlOnRequest(data);
 	};
 
