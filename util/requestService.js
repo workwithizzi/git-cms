@@ -11,17 +11,7 @@ function getLimberSettings() {
 	});
 }
 
-function getLimberPagesSettings() {
-	return request({
-		url:    `/repos/${constants.GITHUB_REPO_OWNER}/${constants.GITHUB_REPO}/contents/${constants.GITHUB_LIMBER_PAGES_SETTINGS_PATH}`,
-		method: "GET",
-		auth: {
-			username: process.env.GITHUB_PRIVATE_TOKEN,
-		},
-	});
-}
-
-function getLimberPages(path) {
+function getLimberContentTypes(path) {
 	return request({
 		url:    `/repos/${constants.GITHUB_REPO_OWNER}/${constants.GITHUB_REPO}/contents/${path}`,
 		method: "GET",
@@ -33,8 +23,7 @@ function getLimberPages(path) {
 
 const RequestService = {
 	getLimberSettings,
-	getLimberPagesSettings,
-	getLimberPages,
+	getLimberContentTypes,
 };
 
 export default RequestService;

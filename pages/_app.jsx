@@ -12,11 +12,15 @@
  *
  */
 
+import React, { Fragment } from "react";
 import App from "next/app";
 import Head from "next/head";
-import React from "react";
 
 import RequestService from "../util/requestService";
+import { toUpperCaseFirstChar } from "../util/strings";
+
+import Layout from "../components/Layout";
+import Drawer from "../components/Drawer";
 
 class GitCMS extends App {
 	static async getInitialProps({ Component, ctx }) {
@@ -26,13 +30,27 @@ class GitCMS extends App {
 			pageProps = await Component.getInitialProps(ctx);
 		}
 
+		// GET `limber.yml` file
 		const limberSettings = await RequestService
 			.getLimberSettings();
+
+		// GET `limber/` files
+		const contentTypes = await RequestService
+			.getLimberContentTypes(limberSettings.config_path);
+
+		// GET content of each file in the `limber/` repository
+		const contentTypesData = await Promise.all(
+			contentTypes.map(async file =>
+				await RequestService.getLimberContentTypes(file.path)
+			)
+		);
 
 		return {
 			pageProps,
 			path: ctx.asPath,
 			limberSettings,
+			contentTypes,
+			contentTypesData,
 		};
 	}
 
@@ -42,32 +60,44 @@ class GitCMS extends App {
 			pageProps,
 			path,
 			limberSettings,
+			contentTypes,
+			contentTypesData,
 		} = this.props;
 
+		// DETECT current page name
 		let currentPage = "";
-		if (path === "/admin") {
-			currentPage = "Admin";
-		} else if (path === "/") {
-			currentPage = "Home";
-		} else if (path === "/get-contents") {
-			currentPage = "Contents";
+		let pageName = "";
+		if(path.includes("=")) {
+			pageName = path.split("=")[1];
+			currentPage = toUpperCaseFirstChar(pageName);
 		} else {
-			const unSlashedPath = path.split("=")[1];
-			currentPage = unSlashedPath.charAt(0).toUpperCase() + unSlashedPath.slice(1);
+			pageName = path.split("/")[1];
+			if (pageName === "") {
+				currentPage = "Admin";
+			} else {
+				currentPage = toUpperCaseFirstChar(pageName);
+			}
 		}
 
 		return (
-			<>
+			<Fragment>
 				<Head>
 					<title>{`Git CMS | ${currentPage}`}</title>
 					<link rel="icon" href="/favicon.ico" />
 				</Head>
-				<Component
-					path={path}
-					limberSettings={limberSettings}
-					{...pageProps}
-				/>
-			</>
+				<Layout>
+					<Drawer
+						activePath={path}
+						contentTypesData={contentTypesData}
+					/>
+					<Component
+						path={path}
+						limberSettings={limberSettings}
+						contentTypesData={contentTypesData}
+						{...pageProps}
+					/>
+				</Layout>
+			</Fragment>
 		);
 	}
 }

@@ -37,7 +37,6 @@ $font-size: 50px;
 // Drawer
 .l-drawer {
 	width: 10rem;
-	height: 15rem;
 	@include flexbox(column, space-between, center);
 	margin: 1rem;
 	padding: 1rem;
@@ -45,6 +44,7 @@ $font-size: 50px;
 }
 
 .l-drawer__item {
+	margin: 1rem;
 	list-style: none;
 }
 

@@ -42,26 +42,35 @@ function parseYamlOnRequest(data) {
 		console.warn("The data wasn't provided.");
 		return {};
 	}
-	// if the data is not an array - we will have a content on it
-	if (!Array.isArray(data)) {
-		// check if we have a "content" property on the data object
-		if (Object.prototype.hasOwnProperty.call(data, "content")) {
-			// get the "content" in base64
-			const base64Content = data.content;
-			// decode base64 to a readable String
-			const stringToYamlObject = parseYamlOnServer(base64Content);
-			// prepare new object to return
-			let result = new Object();
-			// duplicate the "data" object to ovoid the mutation of it
-			result = Object.assign(result, data);
-			// assign decoded "content" and corresponding "encoding" properties
-			result.content = stringToYamlObject;
-			result.encoding = "ascii";
-			return result.content;
+
+	if (data.name) {
+		if (data.name.split(".")[1] === "md") {
+			return data;
+		} else {
+			// if the data is not an array - we will have a content on it
+			if (!Array.isArray(data)) {
+			// check if we have a "content" property on the data object
+				if (Object.prototype.hasOwnProperty.call(data, "content")) {
+				// get the "content" in base64
+					const base64Content = data.content;
+					// decode base64 to a readable String
+					const stringToYamlObject = parseYamlOnServer(base64Content);
+					// prepare new object to return
+					let result = new Object();
+					// duplicate the "data" object to ovoid the mutation of it
+					result = Object.assign(result, data);
+					// assign decoded "content" and corresponding "encoding" properties
+					result.content = stringToYamlObject;
+					result.encoding = "ascii";
+					return result.content;
+				}
+				// if there's no "content" property
+				return data;
+			}
 		}
-		// if there's no "content" property
-		return data;
 	}
+
+	
 	return data;
 }
 
