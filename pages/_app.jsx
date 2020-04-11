@@ -45,12 +45,18 @@ class GitCMS extends App {
 			)
 		);
 
+		const getGrops = contentTypesData.map(item => item.group);
+
+		const uniqueContentTypes = getGrops.filter((item, pos, self) => {
+			return self.indexOf(item) == pos;
+		});
+
 		return {
 			pageProps,
 			path: ctx.asPath,
 			limberSettings,
-			contentTypes,
 			contentTypesData,
+			uniqueContentTypes,
 		};
 	}
 
@@ -60,8 +66,8 @@ class GitCMS extends App {
 			pageProps,
 			path,
 			limberSettings,
-			contentTypes,
 			contentTypesData,
+			uniqueContentTypes,
 		} = this.props;
 
 		// DETECT current page name
@@ -88,7 +94,7 @@ class GitCMS extends App {
 				<Layout>
 					<Drawer
 						activePath={path}
-						contentTypesData={contentTypesData}
+						uniqueContentTypes={uniqueContentTypes}
 					/>
 					<Component
 						path={path}

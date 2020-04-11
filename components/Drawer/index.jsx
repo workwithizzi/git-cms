@@ -3,17 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTachometerAlt, faCog, faRandom } from "@fortawesome/free-solid-svg-icons";
 import PT from "prop-types";
 
-function Drawer({ activePath, contentTypesData }) {
+function Drawer({ activePath, uniqueContentTypes }) {
 
 	function _renderLimberContentGroupItems(groups) {
 		return (
-			groups.map(group => {
+			groups.map(item => {
 				const icon = faRandom;
 				return (
-					<li className="l-drawer__item" key={group.name}>
-						<a className={`l-drawer__btn btn--content-group ${activePath === `/groups?group=${group.name}` ? "isActive" : "notActive"}`} href={`/groups?group=${group.name}`}>
+					<li className="l-drawer__item" key={item}>
+						<a className={`l-drawer__btn btn--content-group ${activePath === `/groups?group=${item}` ? "isActive" : "notActive"}`} href={`/groups?group=${item}`}>
 							<FontAwesomeIcon className="btn--icon content-group--icon" icon={icon} />
-							<span className="btn--text content-group--text">{group.label}</span>
+							<span className="btn--text content-group--text">{item}</span>
 						</a>
 					</li>
 				);
@@ -37,7 +37,7 @@ function Drawer({ activePath, contentTypesData }) {
 			</li>
 			{/* RENDER Menu Items, based on the pages in the `/limber` folder */}
 			{
-				_renderLimberContentGroupItems(contentTypesData)
+				_renderLimberContentGroupItems(uniqueContentTypes)
 			}
 		</ul>
 	);
@@ -45,7 +45,7 @@ function Drawer({ activePath, contentTypesData }) {
 
 Drawer.propTypes = {
 	activePath: PT.string.isRequired,
-	contentTypesData: PT.array.isRequired,
+	uniqueContentTypes: PT.array.isRequired,
 };
 
 export default Drawer;

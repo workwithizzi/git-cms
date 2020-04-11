@@ -33,7 +33,7 @@ function GroupsPage(props) {
 			data.map(async file => {
 				// selecting the correct `{page_name_content_type}` folder to fetch the files, based on the url's `path`
 				// condition assumes that the url matches the following schema: `/groups?group=pages`
-				if (path.split("=")[1] === file.name) {
+				if (path.split("=")[1] === file.group) {
 					return await RequestService
 						.getLimberContentTypes(file.path);
 				}
