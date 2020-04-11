@@ -2,6 +2,7 @@
 	--main-color: #293845;
 	--settings-color: purple;
 	--reverse-color: whitesmoke;
+	--content-group-color: rgba(7, 66, 194, 0.678);
 }
 
 @mixin flexbox($flex-direction, $justify-content, $align-items) {
@@ -36,7 +37,6 @@ $font-size: 50px;
 // Drawer
 .l-drawer {
 	width: 10rem;
-	height: 7rem;
 	@include flexbox(column, space-between, center);
 	margin: 1rem;
 	padding: 1rem;
@@ -44,6 +44,7 @@ $font-size: 50px;
 }
 
 .l-drawer__item {
+	margin: 1rem;
 	list-style: none;
 }
 
@@ -60,7 +61,7 @@ $font-size: 50px;
 	border: 2px solid var(--main-color);
 
 	&:hover {
-		@include btn-active(var(--main-color), var(--reverse-color));
+		@include btn-active(lighten(#293845, 10%), var(--reverse-color));
 	}
 }
 
@@ -68,7 +69,15 @@ $font-size: 50px;
 	border: 2px solid var(--settings-color);
 
 	&:hover {
-		@include btn-active(var(--settings-color), var(--reverse-color));
+		@include btn-active(lighten(purple, 10%), var(--reverse-color));
+	}
+}
+
+.btn--content-group {
+	border: 2px solid var(--content-group-color);
+
+	&:hover {
+		@include btn-active(lighten(rgba(7, 66, 194, 0.678), 15%), var(--reverse-color));
 	}
 }
 
@@ -78,6 +87,10 @@ $font-size: 50px;
 
 .btn--settings.isActive {
 	@include btn-active(var(--settings-color), var(--reverse-color));
+}
+
+.btn--content-group.isActive {
+	@include btn-active(var(--content-group-color), var(--reverse-color));
 }
 
 .btn--icon {
@@ -99,6 +112,11 @@ $font-size: 50px;
 .settings--icon,
 .settings--text {
 	color: var(--settings-color);
+}
+
+.content-group--icon,
+.content-group--text {
+	color: var(--content-group-color);
 }
 
 // Settings

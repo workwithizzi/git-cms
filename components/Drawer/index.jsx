@@ -1,37 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCog } from "@fortawesome/free-solid-svg-icons";
+import { faTachometerAlt, faCog, faRandom } from "@fortawesome/free-solid-svg-icons";
 import PT from "prop-types";
 
-function Drawer({ activePath, limberData }) {
+function Drawer({ activePath, uniqueContentTypes }) {
 
-	useEffect(() => {
-		_checkLimberSettings(limberData);
-	}, []);
-
-	const [isLimberSettings, setIsLimberSettings] = useState(false);
-
-	function _checkLimberSettings(data) {
-		data && setIsLimberSettings(true);
+	function _renderLimberContentGroupItems(groups) {
+		return (
+			groups.map(item => {
+				const icon = faRandom;
+				return (
+					<li className="l-drawer__item" key={item}>
+						<a className={`l-drawer__btn btn--content-group ${activePath === `/groups?group=${item}` ? "isActive" : "notActive"}`} href={`/groups?group=${item}`}>
+							<FontAwesomeIcon className="btn--icon content-group--icon" icon={icon} />
+							<span className="btn--text content-group--text">{item}</span>
+						</a>
+					</li>
+				);
+			})
+		);
 	}
 
 	return (
 		<ul className="l-drawer">
 			<li className="l-drawer__item">
-				<a className={`l-drawer__btn btn--dashboard ${activePath === "/admin" ? "isActive" : "notActive"}`} href="/admin">
-					<FontAwesomeIcon className="btn--icon dashboard--icon" icon={faCog} />
+				<a className={`l-drawer__btn btn--dashboard ${activePath === "/" ? "isActive" : "notActive"}`} href="/">
+					<FontAwesomeIcon className="btn--icon dashboard--icon" icon={faTachometerAlt} />
 					<span className="btn--text dashboard--text">Dashboard</span>
 				</a>
 			</li>
+			<li className="l-drawer__item">
+				<a className={`l-drawer__btn btn--settings ${activePath === "/settings" ? "isActive" : "notActive"}`} href="/settings">
+					<FontAwesomeIcon className="btn--icon settings--icon" icon={faCog} />
+					<span className="btn--text settings--text">Settings</span>
+				</a>
+			</li>
+			{/* RENDER Menu Items, based on the pages in the `/limber` folder */}
 			{
-				isLimberSettings && (
-					<li className="l-drawer__item">
-						<a className={`l-drawer__btn btn--settings ${activePath === "/admin?page=settings" ? "isActive" : "notActive"}`} href="/admin?page=settings">
-							<FontAwesomeIcon className="btn--icon settings--icon" icon={faCog} />
-							<span className="btn--text settings--text">Settings</span>
-						</a>
-					</li>
-				)
+				_renderLimberContentGroupItems(uniqueContentTypes)
 			}
 		</ul>
 	);
@@ -39,7 +45,7 @@ function Drawer({ activePath, limberData }) {
 
 Drawer.propTypes = {
 	activePath: PT.string.isRequired,
-	limberData: PT.object.isRequired,
+	uniqueContentTypes: PT.array.isRequired,
 };
 
 export default Drawer;
