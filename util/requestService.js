@@ -21,6 +21,17 @@ function getLimberContentTypes(path) {
 	});
 }
 
+function updateLimberArticleContent(path, body) {
+	return request({
+		url:    `/repos/${constants.GITHUB_REPO_OWNER}/${constants.GITHUB_REPO}/contents/${path}`,
+		method: "PUT",
+		body,
+		auth: {
+			username: process.env.GITHUB_PRIVATE_TOKEN,
+		},
+	});
+}
+
 const RequestService = {
 	getLimberSettings,
 	getLimberContentTypes,

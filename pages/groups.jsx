@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { parseCookies, setCookie, destroyCookie } from "nookies";
+import { setCookie } from "nookies";
 import PT from "prop-types";
 
 import "../styles/admin.scss";
@@ -93,13 +93,17 @@ function GroupsPage(props) {
 			parsedContentTypes[index].content = content;
 		});
 
+		data.map((content, index) => {
+			parsedContentTypes[index].sha = content.sha;
+		});
+
 		return parsedContentTypes;
 	}
 
 	// Temporarily passing the mardown further via coockie
 	// later on we shoud add the global state management
 	function _setMarkdown(content) {
-		setCookie(null, "markdown", content, {
+		setCookie(null, "markdown", JSON.stringify(content), {
 			maxAge: 30 * 24 * 60 * 60,
 			path: "/",
 		});
@@ -109,8 +113,12 @@ function GroupsPage(props) {
 		const contentTypes = _parseMarkdown(contentTypeContent);
 		return (
 			contentTypes.map(item => {
+				const obj = {
+					content: item.content,
+					sha: item.sha,
+				};
 				return(
-					<a style={{ textDecoration: "none" }} href={`/article?type=${item.content_type}`} key={item.title} onClick={() => _setMarkdown(item.content)}>
+					<a style={{ textDecoration: "none" }} href={`/article?type=${item.content_type}`} key={item.title} onClick={() => _setMarkdown(obj)}>
 						<div style={{ display: "flex", flexDirection: "row" }}>
 							<p style={{ marginLeft: "10px" }}>{item.title}</p>
 							<p style={{ marginLeft: "10px" }}>{item.content_type}</p>
