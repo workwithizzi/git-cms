@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
+import { parseCookies, setCookie, destroyCookie } from "nookies";
 import PT from "prop-types";
 
 import "../styles/admin.scss";
@@ -24,6 +25,7 @@ function GroupsPage(props) {
 			setContentTypeContent(contentTypeContent);
 		}
 		_fetchData();
+
 	}, []);
 
 	// Get the list of files from the `data/content/{page_name_content_type}/` folder
@@ -52,10 +54,9 @@ function GroupsPage(props) {
 	}
 
 	// PARSE frontmatter of the `md` files
-	function _parseFrontmatter() {
-
+	function _parseMarkdown(data) {
 		// DECODE from base64
-		const decodedContent = contentTypeContent.map(item => {
+		const decodedContent = data.map(item => {
 			return window.atob(item.content);
 		});
 
@@ -83,20 +84,40 @@ function GroupsPage(props) {
 			});
 			return obj;
 		});
+
+		const markdown = decodedContent.map(item => 
+			item.split("---")[2].slice(2)
+		);
+
+		markdown.map((content, index) => {
+			parsedContentTypes[index].content = content;
+		});
+
 		return parsedContentTypes;
 	}
 
+	// Temporarily passing the mardown further via coockie
+	// later on we shoud add the global state management
+	function _setMarkdown(content) {
+		setCookie(null, "markdown", content, {
+			maxAge: 30 * 24 * 60 * 60,
+			path: "/",
+		});
+	}
+
 	function _renderContentTypes() {
-		const contentTypes = _parseFrontmatter();
+		const contentTypes = _parseMarkdown(contentTypeContent);
 		return (
 			contentTypes.map(item => {
 				return(
-					<div key={item.title} style={{ display: "flex", flexDirection: "row" }}>
-						<p style={{ marginLeft: "10px" }}>{item.title}</p>
-						<p style={{ marginLeft: "10px" }}>{item.content_type}</p>
-						<p style={{ marginLeft: "10px" }}>{item.status}</p>
-						<p style={{ marginLeft: "10px" }}>{item.date}</p>
-					</div>
+					<a style={{ textDecoration: "none" }} href={`/article?type=${item.content_type}`} key={item.title} onClick={() => _setMarkdown(item.content)}>
+						<div style={{ display: "flex", flexDirection: "row" }}>
+							<p style={{ marginLeft: "10px" }}>{item.title}</p>
+							<p style={{ marginLeft: "10px" }}>{item.content_type}</p>
+							<p style={{ marginLeft: "10px" }}>{item.status}</p>
+							<p style={{ marginLeft: "10px" }}>{item.date}</p>
+						</div>
+					</a>
 				);
 			})
 		);

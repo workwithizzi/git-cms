@@ -17,6 +17,7 @@
     "markdown-it": "^10.0.0",
     "next": "9.3.2",
     "node-sass": "^4.13.1",
+    "nookies": "^2.2.2",
     "postcss-css-variables": "^0.14.0",
     "react": "16.13.1",
     "react-dom": "16.13.1"
