@@ -54,7 +54,7 @@ function GroupsPage(props) {
 	}
 
 	// PARSE frontmatter of the `md` files
-	function _parseMarkdown(data) {
+	function _parseFrontmatter(data) {
 		// DECODE from base64
 		const decodedContent = data.map(item => {
 			return window.atob(item.content);
@@ -85,16 +85,8 @@ function GroupsPage(props) {
 			return obj;
 		});
 
-		const markdown = decodedContent.map(item => 
-			item.split("---")[2].slice(2)
-		);
-
-		markdown.map((content, index) => {
-			parsedContentTypes[index].content = content;
-		});
-
 		data.map((content, index) => {
-			parsedContentTypes[index].sha = content.sha;
+			parsedContentTypes[index].path = content.path;
 		});
 
 		return parsedContentTypes;
@@ -102,23 +94,19 @@ function GroupsPage(props) {
 
 	// Temporarily passing the mardown further via coockie
 	// later on we shoud add the global state management
-	function _setMarkdown(content) {
-		setCookie(null, "markdown", JSON.stringify(content), {
+	function _setCurrentFilePath(content) {
+		setCookie(null, "file_path", content, {
 			maxAge: 30 * 24 * 60 * 60,
 			path: "/",
 		});
 	}
 
 	function _renderContentTypes() {
-		const contentTypes = _parseMarkdown(contentTypeContent);
+		const contentTypes = _parseFrontmatter(contentTypeContent);
 		return (
 			contentTypes.map(item => {
-				const obj = {
-					content: item.content,
-					sha: item.sha,
-				};
 				return(
-					<a style={{ textDecoration: "none" }} href={`/article?type=${item.content_type}`} key={item.title} onClick={() => _setMarkdown(obj)}>
+					<a style={{ textDecoration: "none" }} href={`/article?type=${item.content_type}`} key={item.title} onClick={() => _setCurrentFilePath(item.path)}>
 						<div style={{ display: "flex", flexDirection: "row" }}>
 							<p style={{ marginLeft: "10px" }}>{item.title}</p>
 							<p style={{ marginLeft: "10px" }}>{item.content_type}</p>
