@@ -73,6 +73,7 @@ function GroupsPage(props) {
 				// delete all the `"` to avoid duplication of them when converting to the object
 				.replace(/"/gm, "");
 
+			// CONVERT `frontmatter` into `Object`
 			const obj = {};
 			data.split(",").forEach(property => {
 				const splittedProperties = property.split(":");
@@ -85,6 +86,8 @@ function GroupsPage(props) {
 			return obj;
 		});
 
+		// ADD markdown file's `path` to the `frontmatter` Object
+		// it is needed to pass the `path` to `article` page and fetch the needed file
 		data.map((content, index) => {
 			parsedContentTypes[index].path = content.path;
 		});
