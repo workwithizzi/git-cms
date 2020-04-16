@@ -8,7 +8,7 @@ import "../styles/admin.scss";
 import RequestService from "../util/requestService";
 import parseFrontmatter from "../util/parseFrontmatter";
 import encodeBase64 from "../util/encodeBase64";
-import formatFrontmatter from "../util/formatFrontmatter";
+import { separateFrontmatter, convertFrontmatter } from "../util/formatFrontmatter";
 
 const MarkdownIt = new md();
 
@@ -25,7 +25,7 @@ function ArticlePage(props) {
 		const decodedContent = encodeBase64(file.content);
 
 		// SEPARATE frontmatter from the `md` file
-		const frontmatter = formatFrontmatter(decodedContent);
+		const frontmatter = separateFrontmatter(decodedContent);
 
 		// SEPARATE markdown from the frontmatter
 		const content = decodedContent.split("---")[2].slice(2);
@@ -51,17 +51,10 @@ function ArticlePage(props) {
 		// SET current date
 		frontmatterObj.date = moment(new Date()).format("YYYY-DD-MM");
 
-		// convert frontmatter object into String with the new date
-		const _fr = `---`;
-		let str = "";
-		const fr = JSON.stringify(frontmatterObj).slice(1, -1);
-		fr.split(",").forEach(property => {
-			const row = `${property.split(":")[0].replace(/['"]+/g, "")}: ${property.split(":")[1]}\n`;
-			str += row;
-		});
-		const newFrm = `${_fr}\n${str}${_fr}`;
+		// GET String out of Object
+		const frontmatter = convertFrontmatter(frontmatterObj);
+		_handleArticleFrontmatterUpdate(frontmatter);
 
-		_handleArticleFrontmatterUpdate(newFrm);
 		// UPDATE content
 		const _updatedContent = `${articleData.frontmatter}\n\n${articleData.content}`;
 		const contentsBase64 = window.btoa(_updatedContent);
@@ -135,7 +128,7 @@ ArticlePage.getInitialProps = async(props) => {
 	const decodedContent = encodeBase64(file.content);
 
 	// SEPARATE frontmatter from the `md` file
-	const frontmatter = formatFrontmatter(decodedContent);
+	const frontmatter = separateFrontmatter(decodedContent);
 
 	const content = decodedContent.split("---")[2].slice(2);
 
