@@ -7,6 +7,7 @@ import "../styles/admin.scss";
 
 import RequestService from "../util/requestService";
 import parseFrontmatter from "../util/parseFrontmatter";
+import encodeBase64 from "../util/encodeBase64";
 
 const MarkdownIt = new md();
 
@@ -19,9 +20,8 @@ function ArticlePage(props) {
 	async function _fetchDataOnRender(path) {
 		// GET the current CT mardown file
 		const file = await RequestService.getLimberContentTypes(path);
-		// DECODE base64 to a String
-		const buff = Buffer.from(file.content, "base64");
-		const decodedContent = buff.toString("ascii");
+		// ENCODE base64 to a String
+		const decodedContent = encodeBase64(file.content);
 
 		// GET frontmatter
 		let frontmatter = decodedContent.split("---")[1].slice(1);
@@ -133,9 +133,8 @@ ArticlePage.getInitialProps = async(props) => {
 	// GET the current CT mardown file
 	const file = await RequestService.getLimberContentTypes(currentFilePath);
 
-	// DECODE base64 to a String
-	const buff = Buffer.from(file.content, "base64");
-	const decodedContent = buff.toString("ascii");
+	// ENCODE base64 to a String
+	const decodedContent = encodeBase64(file.content);
 
 	// GET frontmatter
 	let frontmatter = decodedContent.split("---")[1].slice(1);

@@ -7,6 +7,7 @@ import "../styles/admin.scss";
 import RequestService from "../util/requestService";
 import { toUpperCaseFirstChar } from "../util/strings";
 import parseFrontmatter from "../util/parseFrontmatter";
+import encodeBase64 from "../util/encodeBase64";
 
 function GroupsPage(props) {
 	const { path, contentTypesData } = props;
@@ -56,9 +57,9 @@ function GroupsPage(props) {
 
 	// PARSE frontmatter of the `md` files
 	function _parseFrontmatter(data) {
-		// DECODE from base64
+		// ENCODE from base64
 		const decodedContent = data.map(item => {
-			return window.atob(item.content);
+			return encodeBase64(item.content);
 		});
 
 		const parsedContentTypes = decodedContent.map(item => {
