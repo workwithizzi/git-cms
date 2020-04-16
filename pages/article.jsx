@@ -8,6 +8,7 @@ import "../styles/admin.scss";
 import RequestService from "../util/requestService";
 import parseFrontmatter from "../util/parseFrontmatter";
 import encodeBase64 from "../util/encodeBase64";
+import formatFrontmatter from "../util/formatFrontmatter";
 
 const MarkdownIt = new md();
 
@@ -23,11 +24,8 @@ function ArticlePage(props) {
 		// ENCODE base64 to a String
 		const decodedContent = encodeBase64(file.content);
 
-		// GET frontmatter
-		let frontmatter = decodedContent.split("---")[1].slice(1);
-		// FORMAT frontmatter with `---`
-		const _frontmatter = `---`;
-		frontmatter = `${_frontmatter}\n${frontmatter}${_frontmatter}`;
+		// SEPARATE frontmatter from the `md` file
+		const frontmatter = formatFrontmatter(decodedContent);
 
 		// SEPARATE markdown from the frontmatter
 		const content = decodedContent.split("---")[2].slice(2);
@@ -136,11 +134,8 @@ ArticlePage.getInitialProps = async(props) => {
 	// ENCODE base64 to a String
 	const decodedContent = encodeBase64(file.content);
 
-	// GET frontmatter
-	let frontmatter = decodedContent.split("---")[1].slice(1);
-	// FORMAT frontmatter with `---`
-	const _frontmatter = `---`;
-	frontmatter = `${_frontmatter}\n${frontmatter}${_frontmatter}`;
+	// SEPARATE frontmatter from the `md` file
+	const frontmatter = formatFrontmatter(decodedContent);
 
 	const content = decodedContent.split("---")[2].slice(2);
 
