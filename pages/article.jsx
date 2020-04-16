@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { parseCookies } from "nookies";
 import md from "markdown-it";
 import moment from "moment";
@@ -16,6 +16,11 @@ function ArticlePage(props) {
 
 	const [articleData, setArticleData] = useState(props.markdownData);
 	const [isEditMode, setEditMode] = useState(false);
+
+	useEffect(() => {
+		// Update state on each re-render
+		_fetchDataOnRender(props.markdownData.path);
+	}, []);
 
 	// GET the markdown file content
 	async function _fetchDataOnRender(path) {
@@ -56,7 +61,7 @@ function ArticlePage(props) {
 		_handleArticleFrontmatterUpdate(frontmatter);
 
 		// UPDATE content
-		const _updatedContent = `${articleData.frontmatter}\n\n${articleData.content}`;
+		const _updatedContent = `${frontmatter}\n\n${articleData.content}`;
 		const contentsBase64 = window.btoa(_updatedContent);
 		const body = {
 			message: `Update file's content via GitHub API at ${moment(new Date()).format()}`, // Required. The commit message.
