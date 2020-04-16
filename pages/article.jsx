@@ -85,10 +85,7 @@ function ArticlePage(props) {
 		});
 		const newFrm = `${_fr}\n${str}${_fr}`;
 
-		// TODO: update state via setState
-		//THIS IS a DIRTY WAY, but to set it via `setter` it needs a wrapper function
-		articleData.frontmatter = newFrm;
-
+		_handleArticleFrontmatterUpdate(newFrm);
 		// UPDATE content
 		const _updatedContent = `${articleData.frontmatter}\n\n${articleData.content}`;
 		const contentsBase64 = window.btoa(_updatedContent);
@@ -116,6 +113,10 @@ function ArticlePage(props) {
 		}
 		// FETCH data after it was updated at git to have the current value at state
 		_fetchDataOnRender(articleData.path);
+	}
+
+	function _handleArticleFrontmatterUpdate(data) {
+		setArticleData({ ...articleData, frontmatter: data });
 	}
 
 	function _handleChange() {
