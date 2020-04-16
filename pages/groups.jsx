@@ -6,6 +6,7 @@ import "../styles/admin.scss";
 
 import RequestService from "../util/requestService";
 import { toUpperCaseFirstChar } from "../util/strings";
+import parseFrontmatter from "../util/parseFrontmatter";
 
 function GroupsPage(props) {
 	const { path, contentTypesData } = props;
@@ -61,29 +62,7 @@ function GroupsPage(props) {
 		});
 
 		const parsedContentTypes = decodedContent.map(item => {
-			const data = item
-				// remove `---` separation
-				.split("---")[1]
-				// delete the 1st character which is a `new line`
-				.slice(1)
-				// replace others `new line` characters
-				.replace(/(\r\n|\n|\r)/gm, ",")
-				// delete trailing comma
-				.slice(0, -1)
-				// delete all the `"` to avoid duplication of them when converting to the object
-				.replace(/"/gm, "");
-
-			// CONVERT `frontmatter` into `Object`
-			const obj = {};
-			data.split(",").forEach(property => {
-				const splittedProperties = property.split(":");
-				// if there's a dash symbol, replace it with underscore symbol, because, the object `key` cannot have a name like this: `key-name`
-				const underscoredKey = splittedProperties[0].replace(/-/gm, "_");
-				// remove the ` ` at the beginning of the string
-				const unspacedValue = splittedProperties[1].slice(1);
-				obj[underscoredKey] = unspacedValue;
-			});
-			return obj;
+			return parseFrontmatter(item);
 		});
 
 		// ADD markdown file's `path` to the `frontmatter` Object

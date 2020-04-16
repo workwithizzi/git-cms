@@ -6,7 +6,7 @@ import moment from "moment";
 import "../styles/admin.scss";
 
 import RequestService from "../util/requestService";
-
+import parseFrontmatter from "../util/parseFrontmatter";
 
 const MarkdownIt = new md();
 
@@ -49,36 +49,14 @@ function ArticlePage(props) {
 	async function _onSave() {
 		setEditMode(false);
 
-		// GET frontmatter from the markdown file
-		const _frontmatter = articleData.frontmatter
-		// remove `---` separation
-			.split("---")[1]
-		// delete the 1st character which is a `new line`
-			.slice(1)
-		// replace others `new line` characters
-			.replace(/(\r\n|\n|\r)/gm, ",")
-		// delete trailing comma
-			.slice(0, -1)
-		// delete all the `"` to avoid duplication of them when converting to the object
-			.replace(/"/gm, "");
-
-		// MAKE object of the frontmatter
-		const obj = {};
-		_frontmatter.split(",").forEach(property => {
-			const splittedProperties = property.split(":");
-			// if there's a dash symbol, replace it with underscore symbol, because, the object `key` cannot have a name like this: `key-name`
-			const underscoredKey = splittedProperties[0].replace(/-/gm, "_");
-			// remove the ` ` at the beginning of the string
-			const unspacedValue = splittedProperties[1].slice(1);
-			obj[underscoredKey] = unspacedValue;
-		});
+		const frontmatterObj = parseFrontmatter(articleData.frontmatter);
 		// SET current date
-		obj.date = moment(new Date()).format("YYYY-DD-MM");
+		frontmatterObj.date = moment(new Date()).format("YYYY-DD-MM");
 
 		// convert frontmatter object into String with the new date
 		const _fr = `---`;
 		let str = "";
-		const fr = JSON.stringify(obj).slice(1, -1);
+		const fr = JSON.stringify(frontmatterObj).slice(1, -1);
 		fr.split(",").forEach(property => {
 			const row = `${property.split(":")[0].replace(/['"]+/g, "")}: ${property.split(":")[1]}\n`;
 			str += row;
