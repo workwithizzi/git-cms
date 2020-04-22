@@ -1,16 +1,9 @@
-/**
- * Axios Request Wrapper
- * ---------------------
- *
- * @author  Sheharyar Naseer (@sheharyarn)
- * @license MIT
- *
- */
+// Axios Request Wrapper
 
 import axios     from "axios";
 import constants from "./constants";
 
-
+import { parseYamlOnRequest } from "./parseYaml";
 
 /**
  * Create an Axios Client with defaults
@@ -26,8 +19,10 @@ const client = axios.create({
  */
 const request = function(options) {
 	const onSuccess = function(response) {
-		console.debug("Request Successful!", response);
-		return response.data;
+		// data from a response
+		const data = response.data;
+		// PARSE "yml" content as Object
+		return parseYamlOnRequest(data);
 	};
 
 	const onError = function(error) {
